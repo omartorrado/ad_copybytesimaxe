@@ -35,7 +35,8 @@ public class Copybytesimaxe {
         el doble, ya que contiene la imagen 2 veces */
         copiarArchivo(imaxeOrixinal,imaxeCopia,true);
         //Copiamos usando bufferedStream (pasa de tardar unos 22-24ms a 1-2ms en este caso)
-        copiarArchivoBuffered(imaxeOrixinal,imaxeCopia2,false);
+        //copiarArchivoBuffered(imaxeOrixinal,imaxeCopia2,false);
+        leerArchivo(imaxeCopia);
     }
     
     public static void copiarArchivo(File archivo, File archivoNuevo, boolean añadir) {
@@ -87,6 +88,51 @@ public class Copybytesimaxe {
             }
             timeEnd = System.currentTimeMillis();
             System.out.println("Archivo copiado en "+(timeEnd-timeStart)+"ms con Buffered I/O Stream");
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Copybytesimaxe.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Copybytesimaxe.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static void leerArchivo(File archivo) {
+        int byteActual = 0;
+        int byteAnterior =-1;
+        long timeStart,timeEnd;
+        int cantidadDeImagenes=0;
+        try {
+            FileInputStream fInput = new FileInputStream(archivo);
+            FileOutputStream fOutput= new FileOutputStream("/home/local/DANIELCASTELAO/otorradomiguez/NetBeansProjects/copybytesimaxe/fotoUnida"+cantidadDeImagenes+".jpg",false);
+            timeStart = System.currentTimeMillis();
+            while (byteActual != -1) {
+                byteAnterior=byteActual;
+                byteActual = fInput.read();
+                //255-217 marcan el final del jpeg
+                if(byteAnterior==255&&byteActual==217){
+                    fOutput.write(byteActual);
+                    byteAnterior=-1;
+                    fOutput.close();
+                    cantidadDeImagenes++;
+                    System.out.println("Termina este jpeg");
+                }
+                //255-216 marcan el principio del jpeg
+                else if(byteAnterior==255&&byteActual==216){
+                    System.out.println("Empieza una nueva imagen");
+                    fOutput.close();
+                    fOutput= new FileOutputStream("/home/local/DANIELCASTELAO/otorradomiguez/NetBeansProjects/copybytesimaxe/fotoUnida"+cantidadDeImagenes+".jpg",false);
+                    fOutput.write(byteAnterior);
+                    fOutput.write(byteActual);
+                }else if(byteAnterior!=-1){
+                    fOutput.write(byteActual);
+                }else{
+                    System.out.println("No entro ningun if");
+                }               
+                //System.out.println(Integer.toHexString(byteActual)); 
+                
+            }
+            fInput.close();
+            timeEnd = System.currentTimeMillis();
+            System.out.println("Archivo copiado en "+(timeEnd-timeStart)+"ms");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Copybytesimaxe.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
