@@ -93,6 +93,12 @@ public class Copybytesimaxe {
         }
     }
 
+    /**
+     * Lee el archivo enviado, busca el header(FF D8) de jpeg y crea un archivo con los datos contenidos en él
+     * hasta que llega al final(FF D9), tras lo cual busca si hay un nuevo header jpeg y en caso de encontrarlo 
+     * crea un archivo nuevo
+     * @param archivo 
+     */
     public static void leerArchivo(File archivo) {
         int byteActual = 0;
         int byteAnterior = -1;
